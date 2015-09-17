@@ -293,8 +293,11 @@ ngx_http_push_stream_websocket_reading(ngx_http_request_t *r)
                                 // skip events channel on publish by websocket connections
                                 continue;
                             }
-
-                            if (ngx_http_push_stream_add_msg_to_channel(mcf, r->connection->log, subscription->channel, ctx->frame->payload, ctx->frame->payload_len, NULL, NULL, cf->store_messages, ctx->temp_pool) != NGX_OK) {
+                            
+                            static ngx_str_t NGX_ACKNOWLEDGE_CHANNEL_ID = ngx_string("some-channel-id");
+                            ngx_http_push_stream_channel_t *acknowledge_channel = ngx_http_push_stream_get_channel(&NGX_ACKNOWLEDGE_CHANNEL_ID, r->connection->log, mcf);
+                            
+                            if (ngx_http_push_stream_add_msg_to_channel(mcf, r->connection->log, acknowledge_channel, ctx->frame->payload, ctx->frame->payload_len, NULL, NULL, cf->store_messages, ctx->temp_pool) != NGX_OK) {
                                 goto finalize;
                             }
                         }
